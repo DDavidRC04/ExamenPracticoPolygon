@@ -1,0 +1,7 @@
+Se agrego las siguientes validaciones: 
+  cambio a un registro: forza al usuario a seleccionar solo uno registro, no mas ni menos
+  baja de un registro: forza al usuario a por lo menos seleccionar uno
+
+Se arreglo bug al momento de dar de alta un usuario ya que a veces no hacia las inserciones, para esto se cambio el metodo para realizarlas
+Se arreglo bug al momento de hacer multiples bajas ya que si se hacia mas de una al mismo tiempo generaba un error
+
