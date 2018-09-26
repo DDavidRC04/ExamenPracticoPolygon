@@ -32,7 +32,7 @@
                     +"' where idUsuario="+idUsr+";";
             objConn.Update(cambio);
             //actualizo todos los valores en la tabla perfil
-            cambio = "update perfil set nombreperfil='"+nomPerf+"',habilitado="+activo+" where idPerfil="+idUsr+";";
+            cambio = "update perfil set nombreperfil='"+nomPerf+"',habilitado=b'"+activo+"' where idPerfil="+idUsr+";";
             objConn.Update(cambio);
             objConn.closeRsStmt();
         %>

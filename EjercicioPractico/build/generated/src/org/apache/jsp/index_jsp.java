@@ -56,6 +56,7 @@ public final class index_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("<!DOCTYPE html>\n");
       out.write("<html>\n");
       out.write("    <head>\n");
+      out.write("        <meta http-equiv=\"Cache-Control\" content=\"no-cache, mustrevalidate\">\n");
       out.write("        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n");
       out.write("        <title>Ejercicio</title>\n");
       out.write("        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n");
@@ -66,20 +67,58 @@ public final class index_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("        <script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js\"></script>\n");
       out.write("    </head>\n");
       out.write("    <body class=\"container\">\n");
-      out.write("        <nav class=\"container navbar navbar-inverse\">\n");
-      out.write("            <div class=\" nav navbar-nav navbar-right\"> \n");
+      out.write("        <nav class=\"container-fluid navbar navbar-inverse\">\n");
+      out.write("            <div class=\" navbar-right\"> \n");
       out.write("                <button id=\"btnAlta\" class=\"btn btn-success navbar-btn\" onclick=\"llamaRegistro()\"> Registro Usuario </button>\n");
-      out.write("                <button id=\"btnAlta\" class=\"btn btn-info navbar-btn\"> Editar Usuario </button>\n");
-      out.write("                <button id=\"btnBaja\" class=\"btn btn-danger navbar-btn\"> Eliminar Usuario(s) </button>\n");
+      out.write("                <button id=\"btnModifica\" class=\"btn btn-info navbar-btn\" onclick=\"actualizaRegistro()\"> Editar Usuario </button>\n");
+      out.write("                <button id=\"btnBaja\" class=\"btn btn-danger navbar-btn\" onclick=\"bajaRegistro()\"> Eliminar Usuario(s) </button>\n");
       out.write("            </div>\n");
       out.write("            <script>\n");
       out.write("                function llamaRegistro(){\n");
       out.write("                    location.href='AgregaUsuario.jsp';\n");
       out.write("                }\n");
+      out.write("                                \n");
+      out.write("                function actualizaRegistro(){\n");
+      out.write("                    var  rows = document.getElementsByName(\"chkRow\"); \n");
+      out.write("                    var nChecked = 0;\n");
+      out.write("                    \n");
+      out.write("                    for (var i=0;i<rows.length;i++){\n");
+      out.write("                        if (rows[i].checked){\n");
+      out.write("                            nChecked++;\n");
+      out.write("                        }\n");
+      out.write("                    }\n");
+      out.write("                    if(nChecked > 1){\n");
+      out.write("                        alert(\"Selecciona solo un registro por favor\");\n");
+      out.write("                    } else if(nChecked == 0){\n");
+      out.write("                        alert(\"Selecciona un Registro por favor\");\n");
+      out.write("                    }\n");
+      out.write("                    if(nChecked == 1){\n");
+      out.write("                        document.getElementById(\"selectedRows\").action = \"EditaUsuario.jsp\";\n");
+      out.write("                        document.getElementById(\"selectedRows\").submit();\n");
+      out.write("                    }\n");
+      out.write("                }\n");
+      out.write("                \n");
+      out.write("                function bajaRegistro(){\n");
+      out.write("                    var  rows = document.getElementsByName(\"chkRow\"); \n");
+      out.write("                    var nChecked = 0;\n");
+      out.write("                    \n");
+      out.write("                    for (var i=0;i<rows.length;i++){\n");
+      out.write("                        if (rows[i].checked){\n");
+      out.write("                            nChecked++;\n");
+      out.write("                        }\n");
+      out.write("                    }\n");
+      out.write("                    if(nChecked > 0){\n");
+      out.write("                        document.getElementById(\"selectedRows\").action = \"procesaBaja.jsp\";\n");
+      out.write("                        document.getElementById(\"selectedRows\").submit();  \n");
+      out.write("                    }else if (nChecked == 0){\n");
+      out.write("                        nChecked=0;\n");
+      out.write("                        alert(\"Selecciona un Registro por favor\");\n");
+      out.write("                    }                            \n");
+      out.write("                }\n");
       out.write("            </script>    \n");
       out.write("        </nav>\n");
       out.write("        <div>\n");
-      out.write("            <form>\n");
+      out.write("            <form method=\"post\" id=\"selectedRows\" action=\"\">\n");
       out.write("                <table class=\"table table-striped table-hover\">\n");
       out.write("                    <tr>\n");
       out.write("                        <th></th>\n");
@@ -96,30 +135,30 @@ public final class index_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("                    </tr>\n");
       out.write("\n");
       out.write("                    ");
-  String aux ="";
-                        int n = 0;
-                        //String idUsuario,idPerfil,claveusuario,Nombre,Apellido,email,contasena,nombreperfil,habilitado;
-                        //String idUsr,idPerf,cUsr,nom,ape,em,pass,nomPerf,activo;
-                        String consulta="SELECT usr.*, pf.* FROM example.usuario as usr LEFT JOIN example.usuarioperfil as up ON usr.idUsuario = up.idUsuario left join example.perfil as pf on up.idPerfil = pf.idPerfil;";
+  
+                        int n = 0;//almacena la cantidad de registros en la tabla
+                        //realiza la cnsulta para obtener los datos de ambas tablas
+                        String consulta="SELECT usr.*, pf.idPerfil, pf.nombreperfil,if(pf.habilitado = b'1','TRUE', 'FALSE')FROM example.usuario as usr LEFT JOIN example.usuarioperfil as up ON usr.idUsuario = up.idUsuario left join example.perfil as pf on up.idPerfil = pf.idPerfil;";
                         objConn.Consult(consulta);
+                        //si la consulta retorna un resultado 
                         if(objConn.rs!=null){
-                            try{
-                                objConn.rs.last();
-                                n=objConn.rs.getRow();//total de registros
-                                objConn.rs.first();
+                            try{//obtengo la cantidad de registros en la tabla
+                                objConn.rs.last();//voy al ultimo registro de la tabla
+                                n=objConn.rs.getRow();//obtengo el total de registros
+                                objConn.rs.first();//regreso al inicio de la tabla
                             }catch(Exception e){}
                             try{
-                                for(int j=1;j<=n;j++){
+                                for(int j=1;j<=n;j++){//despliego la tabla en pantalla, primero me desplazo por las filas
       out.write("\n");
       out.write("                                <tr>\n");
       out.write("                                    <td> \n");
-      out.write("                                        <input class=\"checkbox\" name=\"");
+      out.write("                                        <input class=\"checkbox\" name=\"chkRow\" value=\"");
       out.print( objConn.rs.getString(1));
       out.write("\" type=\"checkbox\">\n");
       out.write("                                    </td>\n");
       out.write("                    ");
                 
-                                    for(int i=1; i<=10; i++){
+                                    for(int i=1; i<=10; i++){ 
       out.write("\n");
       out.write("                                    <td>\n");
       out.write("                    ");
@@ -140,13 +179,13 @@ public final class index_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("                                    </td>\n");
       out.write("                    ");
                 }
-                                objConn.rs.next();
+                                objConn.rs.next();// me desplazo al siguiente registro
       out.write("\n");
       out.write("                                    \n");
       out.write("                                </tr>\n");
       out.write("                    ");
             }
-                            }catch(Exception e){}    
+                            }catch(Exception ex){}    
                         }
                     
       out.write("\n");

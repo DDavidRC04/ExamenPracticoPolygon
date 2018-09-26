@@ -22,13 +22,12 @@
             //String idUsuario,idPerfil,claveusuario,Nombre,Apellido,email,contasena,nombreperfil,habilitado;
             String cUsr,nom,ape,em,pass,nomPerf,activo;
             int idUsr,idPerf;
-            String consulta="SELECT usr.*, pf.* FROM example.usuario as usr LEFT JOIN example.usuarioperfil as up ON usr.idUsuario = up.idUsuario left join example.perfil as pf on up.idPerfil = pf.idPerfil;";
+            String consulta="SELECT usr.*, pf.* FROM example.usuario as usr LEFT JOIN example.usuarioperfil as up ON usr.idUsuario = up.idUsuario left join example.perfil as pf on up.idPerfil = pf.idPerfil order by usr.idUsuario desc;";
             objConn.Consult(consulta);//consulta que me obtiene todos los registros en ambas tablas
             if(objConn.rs!=null){
                 try{
-                    objConn.rs.last();//me posiciono en el ultimo reg
-                    n=objConn.rs.getRow();//total de registros
-                    objConn.rs.first();//vuelvo al primer registro
+                    objConn.rs.first();//me posiciono en el ultimo reg
+                    n=objConn.rs.getInt("idUsuario");
                 }catch(Exception e){}
             }
             //ontengo todos los datos del formulario
@@ -43,14 +42,13 @@
             nomPerf = (request.getParameter("Per")).trim();
             activo= request.getParameter("habil");
             Date fecha = new Date();//obtengo la fecha del sistema 
-            SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");//le doy e formato necesario para el campo en la bd
-            
-            //insert en usuario
+            SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");//le doy e formato necesario para el campo en la bd%>
+            <%//insert en usuario
             String alta = "Insert into usuario (idUsuario,claveusuario,Nombre,Apellido,email,contrasena,fechaupdate)"
                 + " values("+idUsr+",'"+cUsr+"','"+nom+"','"+ape+"','"+em+"','"+pass+"','"+dt.format(fecha)+"');";
             objConn.Update(alta);
             //inserto en perfil
-            alta = "Insert into perfil (idPerfil,nombreperfil,habilitado) values("+idPerf+",'"+nomPerf+"',"+activo+");";
+            alta = "Insert into perfil (idPerfil,nombreperfil,habilitado) values("+idPerf+",'"+nomPerf+"',b'"+activo+"');";
             objConn.Update(alta);
             
             //inserto en la relacion

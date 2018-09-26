@@ -30,15 +30,43 @@
                 function llamaRegistro(){
                     location.href='AgregaUsuario.jsp';
                 }
-                
-                function bajaRegistro(){
-                    document.getElementById("selectedRows").action = "procesaBaja.jsp";
-                    document.getElementById("selectedRows").submit();                    
+                                
+                function actualizaRegistro(){
+                    var  rows = document.getElementsByName("chkRow"); 
+                    var nChecked = 0;
+                    
+                    for (var i=0;i<rows.length;i++){
+                        if (rows[i].checked){
+                            nChecked++;
+                        }
+                    }
+                    if(nChecked > 1){
+                        alert("Selecciona solo un registro por favor");
+                    } else if(nChecked == 0){
+                        alert("Selecciona un Registro por favor");
+                    }
+                    if(nChecked == 1){
+                        document.getElementById("selectedRows").action = "EditaUsuario.jsp";
+                        document.getElementById("selectedRows").submit();
+                    }
                 }
                 
-                function actualizaRegistro(){
-                    document.getElementById("selectedRows").action = "EditaUsuario.jsp";
-                    document.getElementById("selectedRows").submit();
+                function bajaRegistro(){
+                    var  rows = document.getElementsByName("chkRow"); 
+                    var nChecked = 0;
+                    
+                    for (var i=0;i<rows.length;i++){
+                        if (rows[i].checked){
+                            nChecked++;
+                        }
+                    }
+                    if(nChecked > 0){
+                        document.getElementById("selectedRows").action = "procesaBaja.jsp";
+                        document.getElementById("selectedRows").submit();  
+                    }else if (nChecked == 0){
+                        nChecked=0;
+                        alert("Selecciona un Registro por favor");
+                    }                            
                 }
             </script>    
         </nav>
@@ -62,7 +90,7 @@
                     <%  
                         int n = 0;//almacena la cantidad de registros en la tabla
                         //realiza la cnsulta para obtener los datos de ambas tablas
-                        String consulta="SELECT usr.*, pf.* FROM example.usuario as usr LEFT JOIN example.usuarioperfil as up ON usr.idUsuario = up.idUsuario left join example.perfil as pf on up.idPerfil = pf.idPerfil;";
+                        String consulta="SELECT usr.*, pf.idPerfil, pf.nombreperfil,if(pf.habilitado = b'1','TRUE', 'FALSE')FROM example.usuario as usr LEFT JOIN example.usuarioperfil as up ON usr.idUsuario = up.idUsuario left join example.perfil as pf on up.idPerfil = pf.idPerfil;";
                         objConn.Consult(consulta);
                         //si la consulta retorna un resultado 
                         if(objConn.rs!=null){
@@ -78,12 +106,12 @@
                                         <input class="checkbox" name="chkRow" value="<%= objConn.rs.getString(1)%>" type="checkbox">
                                     </td>
                     <%                
-                                    for(int i=1; i<=10; i++){ // me desplazo por las columnas, añadiendo los valores de cada columna a la columna de html%>
+                                    for(int i=1; i<=10; i++){ %>
                                     <td>
                     <%                    if(i != 10){%>
                                             <%=objConn.rs.getString(i)%>
                     <%                    }else{  %>
-                                            <%=objConn.rs.getBoolean(i)//caso especial para la parte de habilitado donde muestro un booleano %>
+                                            <%=objConn.rs.getBoolean(i)%>
                     <%                    }%>
                                     </td>
                     <%                }
@@ -91,7 +119,7 @@
                                     
                                 </tr>
                     <%            }
-                            }catch(Exception e){}    
+                            }catch(Exception ex){}    
                         }
                     %>
                 </table>
